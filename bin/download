@@ -10,8 +10,4 @@ source "${plugin_dir}/lib/utils.bash"
 
 mkdir -p "$ASDF_DOWNLOAD_PATH"
 
-release_file="$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
-
-download_release "$ASDF_INSTALL_VERSION" "$release_file"
-
-chmod +x "$release_file"
+download_release "$ASDF_INSTALL_VERSION"

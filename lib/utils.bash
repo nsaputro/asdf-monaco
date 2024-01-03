@@ -33,16 +33,24 @@ list_all_versions() {
 }
 
 download_release() {
-	local version filename platform arch url
+	local version original_fname platform arch url
 	version="$1"
-	filename="$2"
 	platform="$(get_platform)"
 	arch="$(get_arch)"
+	original_fname="$TOOL_NAME-${platform}-${arch}"
 
-	url="$GH_REPO/releases/download/v${version}/monaco-${platform}-${arch}"
+	url="$GH_REPO/releases/download/v${version}/${original_fname}"
 
 	echo "* Downloading $TOOL_NAME release $version..."
-	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
+	curl "${curl_opts[@]}" -o "$ASDF_DOWNLOAD_PATH/$original_fname" -C - "$url" || fail "Could not download $url"
+
+	#download shasum
+	curl "${curl_opts[@]}" -o "$ASDF_DOWNLOAD_PATH/$original_fname.sha256" -C - "$url.sha" || fail "Could not download $url.sha"
+
+	check_shasum
+
+	mv "$ASDF_DOWNLOAD_PATH/$original_fname" "$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
+	chmod +x "$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
 }
 
 get_platform() {
@@ -67,6 +75,25 @@ get_arch() {
 	else
 		echo "amd64"
 	fi
+}
+
+check_shasum() {
+	local sha_cmd
+
+	if command -v sha256sum >/dev/null; then
+		sha_cmd=(sha256sum)
+	elif command -v shasum >/dev/null; then
+		sha_cmd=(shasum -a 256)
+	else
+		echo "WARNING: sha256sum/shasum program not found - unable to checksum. Proceed with caution."
+		return 0
+	fi
+
+	(
+		echo "Checking sha256 sum..."
+		cd "${ASDF_DOWNLOAD_PATH}" || exit 1
+		"${sha_cmd[@]}" -c ./*.sha256
+	)
 }
 
 install_version() {
