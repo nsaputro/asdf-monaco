@@ -90,7 +90,7 @@ check_shasum() {
 	fi
 
 	(
-		echo "Checking sha512 sum..."
+		echo "Checking sha256 sum..."
 		cd "${ASDF_DOWNLOAD_PATH}" || exit 1
 		"${sha_cmd[@]}" -c ./*.sha256
 	)
@@ -106,8 +106,6 @@ install_version() {
 	fi
 
 	(
-		check_shasum
-
 		mkdir -p "$install_path"
 		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
