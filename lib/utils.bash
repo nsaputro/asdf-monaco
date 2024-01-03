@@ -33,25 +33,24 @@ list_all_versions() {
 }
 
 download_release() {
-	local version filename platform arch url
+	local version original_fname platform arch url
 	version="$1"
 	platform="$(get_platform)"
 	arch="$(get_arch)"
-	filename="$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
-	original_fname="$ASDF_DOWNLOAD_PATH/monaco-${platform}-${arch}"
+	original_fname="$TOOL_NAME-${platform}-${arch}"
 
 	url="$GH_REPO/releases/download/v${version}/${original_fname}"
 
 	echo "* Downloading $TOOL_NAME release $version..."
-	curl "${curl_opts[@]}" -o "$original_fname" -C - "$url" || fail "Could not download $url"
+	curl "${curl_opts[@]}" -o "$ASDF_DOWNLOAD_PATH/$original_fname" -C - "$url" || fail "Could not download $url"
 
 	#download shasum
-	curl "${curl_opts[@]}" -o "$original_fname.sha256" -C - "$url.sha" || fail "Could not download $url.sha"
+	curl "${curl_opts[@]}" -o "$ASDF_DOWNLOAD_PATH/$original_fname.sha256" -C - "$url.sha" || fail "Could not download $url.sha"
 
 	check_shasum
 
-	mv "$original_fname" "$filename"
-	chmod +x "$filename"
+	mv "$ASDF_DOWNLOAD_PATH/$original_fname" "$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
+	chmod +x "$ASDF_DOWNLOAD_PATH/$TOOL_NAME"
 }
 
 get_platform() {
