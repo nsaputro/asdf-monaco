@@ -85,12 +85,12 @@ check_shasum() {
 	elif command -v shasum >/dev/null; then
 		sha_cmd=(shasum -a 256)
 	else
-		log "WARNING: sha256sum/shasum program not found - unable to checksum. Proceed with caution."
+		echo "WARNING: sha256sum/shasum program not found - unable to checksum. Proceed with caution."
 		return 0
 	fi
 
 	(
-		log "Checking sha512 sum..."
+		echo "Checking sha512 sum..."
 		cd "${ASDF_DOWNLOAD_PATH}" || exit 1
 		"${sha_cmd[@]}" -c ./*.sha256
 	)
